@@ -1,0 +1,78 @@
+=TEX
+\documentclass{article}
+\usepackage{fpic,color,pstcol,ProofPower,graphicx}
+\begin{document}
+Run doctex to produce the tex file, then pictures can be created using SML code.
+Run docsml before running pdflatex...
+=DUMP run.sh
+doctex tryit.doc
+docsml tryit.doc
+poly < tryit.sml
+pptexenv latex tryit.tex
+dvips tryit.dvi
+ps2pdf tryit.ps
+=SH
+chmod 755 run.sh
+=TEX
+\fpic{pix}{
+val b1 = box 2.0 4.0;
+b1 hseq (b1 scaleXY (0.5,0.5));
+}
+\fpic{list}{
+val cell = let val car = namePic dbox "car"
+               val cdr = namePic dbox "cdr"
+           in car vseq cdr end;
+
+let val cells = (namePic cell "left") hseq (hspace 1.0) hseq
+                (namePic cell "right")
+    val source = cells pic "left" pic "cdr" pt "c"
+    val target = cells pic "right" pic "car" pt "w"
+in cells seq (bezier source (source ++ (1.0,0.0))
+                     (target -- (1.0,0.0)) target
+              withArrowStyle "->")
+end;
+}
+\fpic{stackframe}{
+val frame = 
+ label "198" dbox vseq
+            label "558" dbox vseq
+            label "ret addr" dbox vseq
+            label "old ebp" dbox;
+frame;
+}
+(*
+\fpic{more}{
+infix 7 cellseq;
+fun cell1 cellseq cell2 =
+   let val cells = (group cell1) hseq (hspace 1.0) hseq (group cell2)
+   in cells seq curvedharrow (cells nthpic 1 pic "cdr" pt "c")
+                            (cells nthpic 3 pic "car" pt "w")
+   end;
+val cellseqlist = mkseqlist (op cellseq);
+fun labelCar L = cell seq (L centeredAt (cell pic "car" pt "c"));
+cellseqlist (map labelCar [text "A",text "B",text "C"]);
+(*                            dcircle scaleTo (height (cell pic "car"), *)
+(*                                              width (cell pic "car")), *)
+(*                            cell scale 0.3]); *)
+}
+*)
+=SML
+use "fpic.sml";
+processTeXfile "tryit";
+use "fpicpics.sml";
+
+=C lab.c
+#include <stdio.h>
+int f(int x)
+{
+   if(x > 0) return x + f(x-1);
+   else return 0;
+}
+int main()
+{
+   printf("%i\n",f(10));
+}
+=TEX
+
+
+\end{document}

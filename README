@@ -1,0 +1,40 @@
+This directory contains the following 19 files:
+
+1. This README file.
+
+2. FPIC source files:
+        fpic.sml
+        types.sml
+        context.sml
+        environment.sml
+        primitives.sml
+        latexboxes.sml
+        pstricks.sml
+        newprimitives.sml
+        regexp.sml
+        packages.sml
+        helpers.sml
+        points.sml
+        text.sml
+   Load FPIC by starting SML and entering "use fpic.sml".
+
+3. Style file fpic.sty.  This file must be included, along with the
+   pstricks style files, in any Latex file that uses FPIC.
+
+4. Documentation in the form of two HTML documents:
+        index.html
+        fpicdefs.html
+
+5. The postscript file paper.ps.  This is a *preliminary* version of
+  the paper "A Special-purpose Language for Picture-Drawing, by myself
+  and David Hyatt.  The final version will be given at the DSL '97
+  conference in Santa Barbara in October.
+
+6. The file paperpics.sml contains the pictures used in the preliminary
+   version of the paper.  The paper was written before the Latex
+   integration was done, so this file is a separate list of all the
+   pictures.  Each is drawn using the "draw" command, which creates a
+   file of pstricks commands which are in turn input into Latex
+   documents using \input.  This method is now obsolete.  The final
+   version of the paper will include the pictures using the mechanism
+   that is outlined in index.html.

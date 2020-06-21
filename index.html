@@ -1,0 +1,202 @@
+<HTML>
+<HEAD>
+<TITLE>Sam Kamin's FPIC Page</TITLE>
+</HEAD>
+<BODY>
+<H2>
+FPIC
+</H2>
+
+<P>
+David Hyatt and I are building a language for picture specification
+on top of Standard ML.
+It is provided with primitives that are inspired by the language
+PIC, which was - still is, I suppose - used for picture specification
+in the troff environment.
+The main idea is that, once these primitives are defined, the
+ML language features can be used to create "libraries" of code
+for drawing various types of pictures.
+
+<P>
+We have just finished a paper on the system:
+
+<P>
+<A HREF="fpic-paper.ps"> Samuel Kamin, David Hyatt,
+  <EM> A Special-purpose Language for Picture-Drawing</EM>,
+  June 13, 1997, submitted for publication.
+</A>
+
+<P>This will appear, in revised form, in the
+<A HREF="http://www.usenix.org/events/dsl97/index.html">
+DSL '97 conference</A>
+in Santa Barbara, CA, in October, 1997.
+
+<P>
+FPIC runs in Standard ML of New Jersey, version 109.29.
+(It seems to run in Moscow ML also,
+but I've only tried a couple of simple examples.
+There is one glitch;  look in the file latexboxes.sml for
+a comment containing "Moscow ML".)
+
+<P>
+To obtain a preliminary version of the FPIC code
+in gzip format,
+<A HREF="fpic.gzip">click here</A>;
+for a compressed tar file,
+<A HREF="fpic.tar,Z">click here</A>.
+Each of these expands to a collection of files, explained in
+the README file, so they should be uncompressed in a new directory.
+
+<P>
+FPIC picture specifications are included in Latex documents.
+Using ML functions described below, each picture produces
+a file containing pstricks macros.
+(Pstricks is a package of TeX macros developed by ???.)
+When the Latex document is run through latex, these files
+are read and produce the pictures that were specified.
+
+<P>
+More specifically
+FPIC is simply a set of definitions in ML, so
+programming in FPIC is programming in ML.
+An FPIC specification is an ML expression of type Picture.
+To obtain a listing of the Picture-forming operations
+of FPIC,
+<A HREF="fpicdefs.html">click here</A>.
+This page explains the two commands used to extract the
+FPIC specifications from Latex documents and run them.
+
+<P>
+To incorporate FPIC pictures in Latex documents:
+
+<OL>
+<LI>
+Include the style file fpic.sty, as well as the pstricks files.
+Normally, this is done in the documentstyle command:
+
+<PRE>
+      \documentstyle[fpic,pstricks,...]{...}
+</PRE>
+<P>   
+Give the SML code for each picture as the second argument to
+the FPIC command.  The first argument is the name of the picture,
+which must be a valid TeX command name as well as a valid file
+name (on whatever system you are one);  basically, this means that
+it must contain alphabetic characters only.
+
+<PRE>
+       \fpic{picname}{ ...
+          ....
+       }
+</PRE>
+
+<P>
+The picture to be drawn here must be included as an
+<em>anonymous</em> Picture-valued expression, the last expression
+in the brackets.
+For example,
+
+<PRE>
+        \fpic{boxpic}{
+        val b1 = box 2.0 4.0;
+        b1 hseq (b1 scaleXY 0.5);
+        }
+</PRE>
+
+is good, and
+
+<PRE>
+        \fpic{boxpic}{
+        let val b1 = box 2.0 4.0;
+        in b1 hseq (b1 scaleXY 0.5)
+        end;
+        }
+</PRE>
+
+is also good, but
+
+<PRE>
+        \fpic{boxpic}{
+        val b1 = box 2.0 4.0;
+        val thebox = b1 hseq (b1 scaleXY 0.5);
+        }
+</PRE>
+
+is not.  (This is because FPIC refers to the picture drawn in
+each FPIC command as <code>it</code>, which in SML refers to the
+most recent unnamed value.)
+
+<P>
+Note that the final } must be on a new line and must be the
+only character on that line.
+
+<P>
+All the FPIC code will eventually be evaluated in one shot, so
+you may include definitions in earlier pictures that will be
+seen by later pictures.
+
+<P>
+Reminder:  backslashes inside quotes in the FPIC code need
+to be escaped, that is, doubled.
+
+<LI> Before running Latex, load FPIC by starting SML and
+entering
+
+<PRE>
+       use "fpic.sml";
+</PRE>
+<P> Then enter the expression
+
+<PRE>
+       processTeXfile "filename";
+</PRE>
+
+<P>
+where your TeX file is filename.tex.
+
+<P>
+This step creates a file named "fpicpics.sml", which is mainly just
+a listing of all the FPIC code given in \fpic commands.
+
+<LI> In FPIC (that is, in ML with FPIC functions loaded), enter
+
+<PRE>
+       use "fpicpics.sml";
+</PRE>
+
+<P>
+When evaluated, the expressions in fpicpics.sml create files
+fpic-pic1.tex, fpic-pic2.tex, etc., where pic1, pic2, ..., are the
+picture names from the FPIC commands.  It also attempts to find
+the sizes of all the text boxes from the log file;  the first time
+a text box shows up, the log file will have no record of it and
+FPIC will use an approximation;
+on subsequent runs, the correct sizes of text boxes will be used.
+
+<LI> Run latex on the TeX file.  This will include the FPIC pictures.
+However, it will not correctly calculate the sizes of text boxes.
+
+<LI> To correctly calculate the sizes of text boxes, repeat steps 3 and
+   4.  Each time a new picture is added, or a picture is modified
+   so as to include more or different text boxes, steps 2 - 4 must
+   be done, and then steps 3 and 4 repeated. (On the other hand,
+   changes in the TeX file that do not involved pictures do not
+   require that step 2 or 3 be done again.)
+
+<P>
+<HR>
+
+</BODY>
+</HTML>
+
+<A HREF="../dslresearch.html">
+<image src="../icons/back.gif"> Back to Sam Kamin's DSL research page
+</A>
+<br>
+<A HREF="../index.html">
+<image src="../icons/home.gif"> Back to Sam Kamin's home page
+</A>
+
+</BODY>
+</HTML>
+

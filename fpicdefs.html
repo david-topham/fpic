@@ -1,0 +1,324 @@
+<HTML>
+<HEAD>
+<TITLE>FPIC Operation</TITLE>
+</HEAD>
+<BODY>
+<H2>
+FPIC Operations
+</H2>
+
+<P>
+These are the user-level functions defined in FPIC.
+The most important type is Picture.
+Users will also use operations on real numbers and on Points.
+
+<P>
+Lengths are given in centimeters.
+
+<P>
+<H3>Basic pictures</H3>
+
+<P>
+In addition to drawing the pictures, these operations
+also create environments naming the points of that picture
+corresponding to compass directions.
+These points are called n, s, e, w, ne, se, nw, and sw, as
+well as center.
+Where indicated, some additional points may be automatically
+named.
+Users can add additional named points as well as named subpictures
+using the operations in the
+<A HREF="#environment">environments section</A>.
+
+<P>
+<UL>
+<LI> <code>empty</code>: Picture.
+<LI> <code>box</code>: Real * Real -> Picture.  Arguments are width and height.
+<LI> <code>oval</code>: Real * Real -> Picture.  Same as box arguments.
+<LI> <code>polygon</code>: Point list -> Picture.  Draws a closed polygon.
+<LI> <code>openCurve</code>: Point list -> Picture.  Interpolates an open curve.
+<LI> <code>closedCurve</code>: Point list -> Picture.  Interpolates a closed curve.
+<LI> <code>wedge</code>: real * real * real -> Picture.
+   wedge rad theta1 theta2 draws a wedge of a circle of radius rad
+   from angle theta1 to theta2.
+   Angles are given in degrees.
+   The wedge is drawn counterclockwise, so that wedge 1.0 10.0 -10.0
+   will draw almost an entire circle.
+<LI> <code>arc</code>: real * real * real -> Picture.  Same arguments as wedge.
+<LI> <code>arccw</code>: real * real * real -> Picture.  Same arguments as arc, but
+  with the arc drawn clockwise from the first angle to the second.
+<LI> <code>square</code>: real -> Picture.
+<LI> <code>triangle</code>: Point -> Point -> Point -> Point.
+<LI> <code>circle</code>: real -> Picture.
+<LI> <code>point</code>: Point -> Picture.  Draws a small filled circle.
+<LI> <code>tript</code>: real * real -> Picture.  Draws small triangle.
+<LI> <code>sqpt</code>: real * real -> Picture.  Draws small square.
+<LI> <code>crpt</code>: real * real -> Picture.  Draws small cross.
+<LI> <code>bezier</code>: Point * Point * Point * Point -> Picture.
+<LI> <code>label</code>: string -> Picture -> Picture.
+  label s p draws p with string s in the middle.
+<LI> <code>clearbox</code>: Real * Real -> Picture.  Same arguments as box, but
+  does not draw anything.  Used for spacing.
+<LI> <code>hspace</code>: Real -> Picture.  Zero-height horizontal space.
+<LI> <code>vspace</code>: Real -> Picture.  Zero-width vertical space.
+<LI> <code>dbox, doval, dcircle, dtriangle</code>: Picture.
+  These are "default" shapes, useful when the exact shape doesn't
+  really matter.
+  For boxes and ovals, uses the golden ratio.
+  The triangle is an equilateral triangle with base 1.
+</UL>
+
+<H3>Lines</H3>
+
+<P>
+These are mainly functions from pairs of points to pictures.
+In addition to the compass points (which don't really make
+that much sense for lines), the have named points
+start, end, and midpoint.
+
+<P>
+<UL>
+<LI> <code>line</code>: Point * Point -> Picture.  Draws a line between the
+    two points.
+<LI> <code>arrow</code>: Point -> Point -> Picture.
+<LI> <code>doublearrow</code>: Point -> Point -> Picture.
+<LI> <code>harrow</code>: real -> real -> Picture.  harrow ht leng draws an
+   arrow at height ht and length leng from left to right.
+<LI> <code>curvedhline, curvedvline</code>: Point -> Point -> Picture.
+   Draw a curved line, with the first leg of the curve either
+   horizontal or vertical.
+</UL>
+
+
+<H3>Transformations</H3>
+
+<P>
+Transformations are translation, rotation, scaling, changes of color,
+and other stuff.
+Many of these transformations come directly from pstricks.
+
+<P>
+There is a fine line between translation operations, in which
+a picture is moved, and
+sequencing operations, in which two pictures are drawn together,
+with one of them usually being moved.
+We have placed operations that move a single picture here, and
+operations that combine two pictures, even when they involve a
+translation of one of the pictures, in the section on
+<A HREF="#sequencing">sequencing operations</A>.
+
+<P>
+<UL>
+<LI> Translation operations.
+  <UL>
+  <LI> <code>offsetBy</code>: Picture * (real * real) -> Picture (infix).
+  <LI> <code>at</code>: Picture * Point -> Picture (infix).  pic at pt is pic
+    drawn with its southwest corner at pt.
+  <LI> <code>centeredAt</code>: Picture * Point -> Picture (infix).  pic centeredAt pt
+    is pic drawn with its center at pt.
+  <LI> <code>place</code>: Picture -> (Picture -> Point) -> Point -> Picture.
+    place p ptfun pnt draws p in a location such that (ptfun p) = pnt.
+  <LI> <code>placePt</code>: Picture -> string -> Point -> Picture.
+    placePt p name pt places p at a location such that the point
+    named name is at point pt.
+  <LI> <code>up, down, left, right</code>: Picture * real -> Picture (infix).
+    Move the picture by the indicated amount.
+  </UL>
+<LI> Scaling operations.
+  <UL>
+  <LI> <code>scale</code>: Picture * real -> Picture (infix).  pic scale s is pic
+    drawn with its dimensions multiplied by s.
+  <LI> <code>scaleX, scaleY</code>: Picture * real -> Picture (infix).  Picture is
+    scaled only in one dimension.
+  <LI> <code>scaleXY</code>: Picture * (real*real) -> Picture (infix).  Picture
+    scaled in both dimensions.
+  <LI> <code>scaleWithPoint</code>: Picture * ((real*real)*Point) -> Picture.
+    Scale picture in both dimensions, leaving a given point fixed.
+    Normally, scaling leaves the anchor point (southwest) fixed.
+  <LI> <code>scaleTo</code>: Picture * (real*real) -> Picture (infix).
+    scaleTo p (w,h) scales p so that it fits within a box of size
+    w-by-h, but without changing p's aspect ratio.
+  <LI> <code>resize</code>: Picture * (real*real) -> Picture (infix).
+    resize p (w,h) scales p so that its width is w and its height is h.
+  </UL>
+<LI> Scaling operations.
+  <UL>
+  <LI> <code>rotate</code>: Picture * real -> Picture (infix).  pic rotate r is pic
+    rotated by r (an angle in degrees) around its center.
+  <LI> <code>rotateWithPoint</code>: Picture * (real*Point) -> Picture (infix).
+    Picture rotated around a given point.
+  </UL>
+<LI> <code>withBoundingBox</code>:
+<LI> <code>withLineColor</code>: Picture * (real*real*real) -> Picture (infix).
+<LI> <code>withFillColor</code>: Picture * (real*real*real) -> Picture (infix).
+<LI> <code>withFillStyle</code>: Picture * string -> Picture (infix).
+  Fill styles are defined by pstricks.
+<LI> <code>withArrowStyle</code>: Picture * string -> Picture (infix).
+  Arrow styles are defined by pstricks.
+<LI> <code>withLineStyle</code>: Picture * string -> Picture (infix).
+  Line styles are defined by pstricks.
+<LI> <code>withLineWidth</code>: Picture * real -> Picture (infix).
+<LI> <code>withCurvature</code>: Picture * (real*real*real) -> Picture (infix).
+  This comes from pstricks;  I'm not sure what it does.
+<LI> <code>withAttribute</code>: Picture * (string*string) -> Picture (infix).
+  Add an arbitrary attribute (to be interpreted by pstricks) to
+  a picture.
+<LI> <code>transformedWith</code>: Picture * Matrix -> Picture (infix).
+  A Matrix is a transformation matrix of type (real*real*real)*
+  (real*real*real).  (It might take some experimentation to get
+  the values in the right order, as determined by Postscript.)
+</UL>
+
+<A NAME="sequencing">
+<H3>Picture-combining (sequencing) operations</H3>
+
+<P>
+These operations create compound pictures.
+(We call these <em>sequencing</em> operations.)
+
+<P>
+<LI> <code>seq</code>: Picture * Picture -> Picture (infix).  Draw both pictures.
+<LI> <code>hseq</code>: Picture * Picture -> Picture (infix).  Draw the two
+  pictures right next to one another.
+<LI> <code>vseq</code>: Picture * Picture -> Picture (infix).  Draw the first
+  picture on top of the second.
+<LI> <code>cseq</code>: Picture * Picture -> Picture (infix).  Draw both pictures,
+  with their centers aligned.
+<LI> <code>hseqsp, vseqsp</code>: Picture * real -> Picture -> Picture (infix).
+  Like hseq and vseq, but with a gap added.
+<LI> <code>align</code>: (Picture * Point) * (Picture * Point) -> Picture (infix).
+  Draw the two pictures such that the two points coincide.
+<LI> <code>tile</code>: (Picture * Picture -> Picture) -> int -> Picture ->
+   Picture.
+   tile f n pic draws n copies of pic, connected by f.
+<LI> <code>stick</code>: int -> Picture -> Picture.  stick n pic draws n
+   copies of pic right next to one another.
+<LI> <code>stack</code>: int -> Picture -> Picture.  stick n pic draws n
+   copies of pic on top of one another.
+<LI> <code>connect</code>: Picture -> Picture -> (Point * Point -> Picture)
+  -> Picture.  connect p q f draws p, q, and f(p,q).  The intention
+  is that f is a "line function."
+<LI> <code>mkseqfun</code>: (Picture -> Point) -> (Picture -> Point) ->
+   Picture * Picture -> Picture.
+   mkseqfun f g returns a function that draws pictures p and q
+   so that (f p) and (g q) coincide.
+<LI> <code>mkseqlist</code>: SequenceOp -> Picture list -> Picture.
+   A SequenceOp is a function in Picter * Picture -> Picture.
+   mkseqlist op pics draws all the pics using op to combine them.
+   It is basically fold.
+<LI> <code>seqlist, hseqlist, vseqlist, cseqlist</code>: Picture list -> Picture.
+   Combine a list of pictures using the indicated sequencing operator.
+<LI> <code>lineseq</code>:  Picture * Picture -> Picture (infix).
+  Sequences two lines, drawing the second line so that its start point
+  coincides with the end point of the first line.
+<LI> <code>lineseqlist</code>:  Picture list -> Picture.
+</UL>
+
+<A NAME="environments">
+<H3> Environment-oriented operations </H3>
+
+<P>
+These operations relate to naming and numbering of pictures.
+All pictures come with some of their points named, as
+described above.
+Users may add additional named points using the operations
+listed here.
+Note that named points are transformed long with the picture
+itself, so that point "s" may not be south at all, if the picture
+has been rotated.
+To get "true" south, or any other point, use
+operations boundingBox and related operations like north and
+center, which are also included in this section.
+
+<P>
+An irritating subtlety here has to do with numbering of subpictures.
+Since all operations are binary, it would seem that every compound
+picture would have only two subpictures, which is counterintuitive,
+so the combining operations listed above will generally "flatten"
+the environment structure.
+On the other hand, some structure is desirable.
+So, the group operation prevents the flattening of that
+picture within a larger picture.
+For example, <code>p1 seq p2 seq p3</code> has three subpictures
+(numbered 1, 2, and 3), while
+<code>p1 seq (group (p2 seq p3))</code> has two subpictures,
+the second of which has two subpictures.
+When named pictures are added using addNamedPic or addNamedPics,
+they are automatically grouped.
+
+<P>
+<UL>
+<LI> <code>group</code>: Picture -> Picture.  Groups all the subpictures in
+  a compound picture into a single picture.
+  This affects the numbering of pictures in the nthPic function.
+<LI> <code>pt</code>: Picture * string -> Point (infix).  pt p s is the point
+  named s in picture p.
+<LI> <code>pic</code>: Picture * string -> Picture (infix).  pic p s is the picture
+  named s in picture p.
+<LI> <code>nthpic</code>: Picture * int -> Picture (infix).  pic p n is the nth
+  picture in p.
+<LI> <code>namePt</code>: Picture -> string -> Point -> Picture.  pic p s pt is
+  the picture p with the point pt having name s.
+<LI> <code>namePts</code>: Picture -> (string * Point) list -> Picture.
+<LI> <code>namePic</code>: Picture -> string -> Picture.
+  Name a picture, so that it will have this name when placed inside
+  a compound picture.
+  This will also have the effect of grouping this picture (the grouping
+  will be done at the time the picture is added to the larger picture).
+<LI> <code>addNamedPic</code>: Picture -> string -> Picture -> Picture.
+  addNamedPic p1 str p2 is the picture p1 with picture p2 named str.
+<LI> <code>addNamedPics</code>: Picture -> (string * Picture) list -> Picture.
+<LI> <code>pics</code>:  Picture -> (string * Picture) list.
+  All of the subpictures that have names.
+<LI> <code>pts</code>: Picture -> (string * Point) list.
+  All of the points in the picture that have names, along with those names.
+<LI> <code>boundingBox</code>: Picture -> Point * Point * Point * Point.
+  The points in a bounding box are given in order northwest, northeast,
+  southwest, and southeast.
+<LI> <code>width</code>: Picture -> real.
+<LI> <code>height</code>: Picture -> real.
+<LI> <code>center, north, south, east, west, northeast, northwest, southeast,
+  southwest</code>: Picture -> Point.
+<LI> <code>trueOrigin</code>: Picture -> Point.
+</UL>
+
+<H3> Colors </H3>
+
+<P>
+Colors are just triples of real numbers
+(RGB values) between 0 and 1.
+The predefined colors are</code>:
+
+<UL>
+<LI> <code>red = (1.0,0.0,0.0)
+<LI> <code>green = (0.0,1.0,0.0)
+<LI> <code>blue = (0.0,0.0,1.0)
+<LI> <code>white = (1.0,1.0,1.0)
+<LI> <code>black = (0.0,0.0,0.0)
+<LI> <code>magenta = (1.0,0.0,1.0)
+<LI> <code>cyan = (0.0,1.0,1.0)
+<LI> <code>lightGray = (0.7,0.7,0.7)
+<LI> <code>darkGray = (0.4,0.4,0.4)
+<LI> <code>yellow = (1.0,1.0,0.0)
+</UL>
+
+
+<H3> Point operations </H3>
+
+<P>
+These operations create points, which are pairs of real's, or
+otherwise manipulate them.
+
+<P>
+<UL>
+<LI> <code>++</code>: Point * Point -> Point (infix).
+<LI> <code>--</code>: Point * Point -> Point (infix).
+<LI> <code>**</code>: Point * Point -> Point (infix).
+<LI> <code>//</code>: Point * Point -> Point (infix).
+<LI> <code>distance</code>: Point -> Point -> real.
+<LI> <code>midpoint</code>: Point -> Point -> Point.
+</UL>
+
+</BODY>
+</HTML>
+  
